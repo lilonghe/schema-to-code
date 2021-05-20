@@ -1,0 +1,30 @@
+{
+    "fields": [
+        {
+            "tag": "input",
+            "key": "name",
+            "label": "名称",
+            "required": true
+        },
+        {
+            "tag": "textarea",
+            "label": "介绍",
+            "key": "description"
+        },
+        {
+            "tag": "switch",
+            "label": "启用",
+            "key": "enable"
+        }
+    ],
+    "actions": [
+        {
+            "tag": "button",
+            "text": "back"
+        },
+        {
+            "tag": "button",
+            "text": "save"
+        }
+    ]
+}
