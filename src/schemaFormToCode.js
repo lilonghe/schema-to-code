@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { message } from 'antd';
 import MonacoEditor, { loader } from '@monaco-editor/react';
+import ConfigEditor from './configEditor';
+
 loader.config({
     paths: {
       vs: '/monaco-editor/min/vs'
@@ -9,12 +11,15 @@ loader.config({
 
 const SchemaToCode = () => {
     const [schema, setSchema] = useState();
+    const [code, setCode] = useState('');
     const [finalCode, setFinalCode] = useState();
+    const finalCodeEditor = useRef();
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         let text = await file.text();
         try{
+            setCode(text);
             let json = JSON.parse(text);
             setSchema(json);
         }catch(err) {
@@ -24,18 +29,18 @@ const SchemaToCode = () => {
 
     const generateCode = () => {
         let importComponentKeys = { 'Form': true };
-        schema.fields.map(field => {
+        schema?.fields?.map(field => {
             let key = tagToImportKey(field.tag);
             importComponentKeys[key] = true;
         });
-        schema.actions.map(field => {
+        schema?.actions?.map(field => {
             let key = tagToImportKey(field.tag);
             importComponentKeys[key] = true;
         });
 
         let importCode = generateImportCode(Object.keys(importComponentKeys));
-        let fieldsCode = generateFieldsCode(schema.fields);
-        let actionsCode = generateActionsCode(schema.actions);
+        let fieldsCode = generateFieldsCode(schema.fields || []);
+        let actionsCode = generateActionsCode(schema.actions || []);
         let exportCode = generateExportCode();
 
         let template = `${importCode}
@@ -172,34 +177,56 @@ const SchemaToCode = () => {
         }
     }, [schema]);
 
+    useEffect(()=>{
+        if (finalCode) {
+            formatFinalCode();
+        }
+    }, [finalCode]);
+
     const handleChangeFinalCode = (val) => {
         setFinalCode(val);
     }
 
     const handleEditorDidMount = async (editor) => {
-        setTimeout(function() {
-            editor.getAction("editor.action.formatDocument").run();
-        }, 0);
+        finalCodeEditor.current = editor;
+    }
+
+    const handleChangeCode = (val) => {
+        setCode(val);
+        try {
+            let json = JSON.parse(val);
+            setSchema(json);
+        } catch (err) {}
+    }
+
+    const formatFinalCode = () => {
+        finalCodeEditor.current.getAction("editor.action.formatDocument").run();
     }
 
     return <div>
         <input accept='.json' type='file' onChange={handleFileUpload} />
-        
-        <hr />
-        <div>
-            {finalCode && <MonacoEditor
-                width="100%"
-                height="calc(100vh - 30px)"
-                language="javascript"
-                value={finalCode}
-                onChange={handleChangeFinalCode}
-                onMount={handleEditorDidMount}
-                options={{
-                    formatOnType: true,
-                    formatOnPaste: true,
-                    autoIndent: true,
-                }}
-            />}
+        <div style={{display: 'flex', flexDirection: 'row', border: '1px solid #CCC'}}>
+            <div style={{flex: 1, borderRight: '1px solid #CCC'}}>
+                <ConfigEditor value={code} onChange={handleChangeCode} />
+            </div>
+            <div style={{flex: 1}}>
+                <MonacoEditor
+                    height="calc(100vh - 30px)"
+                    language="javascript"
+                    theme='vs-dark'
+                    value={finalCode || ''}
+                    onChange={handleChangeFinalCode}
+                    onMount={handleEditorDidMount}
+                    options={{
+                        formatOnType: true,
+                        formatOnPaste: true,
+                        autoIndent: true,
+                        minimap: {
+                            enabled: false,
+                        },
+                    }}
+                />
+            </div>
         </div>
     </div>
 }
