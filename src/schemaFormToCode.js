@@ -40,9 +40,9 @@ const SchemaToCode = () => {
 
         let importCode = generateImportCode(Object.keys(importComponentKeys));
         let fieldsCode = generateFieldsCode(schema.fields || []);
-        let actionsCode = generateActionsCode(schema.actions || []);
+        let actionsCode = generateActionsCode(schema.actions || [], schema?.meta?.layout || {});
         let exportCode = generateExportCode();
-
+        let layoutCode = generateFormLayout(schema?.meta?.layout || {});
         let template = `${importCode}
         
         const Page = ({ form }) => {
@@ -50,7 +50,7 @@ const SchemaToCode = () => {
 
             const handleSubmit = e => {
                 e.preventDefault();
-                this.props.form.validateFields((err, values) => {
+                form.validateFields((err, values) => {
                   if (!err) {
                     console.log('Received values of form: ', values);
                   }
@@ -58,7 +58,7 @@ const SchemaToCode = () => {
             };
 
             return (
-                <Form>
+                <Form${print(layoutCode)}>
                     ${fieldsCode}
                     ${actionsCode}
                 </Form>
@@ -70,6 +70,26 @@ const SchemaToCode = () => {
         setFinalCode(template);
     }
 
+    const generateFormLayout = (layout) => {
+        let propertys = [];
+        Object.keys(layout).map(key=> {
+            propertys.push(`${key}={${formatObject(layout[key])}}`);
+        });
+        return propertys.join(' ');
+    }
+
+    const formatObject = (codeObject) => {
+        return JSON.stringify(codeObject).replace(/([\{])\"/g,"$1").replace(/\"([\:])/g,"$1").replace(/([\,])\"/g,"$1");
+    }
+
+    const formatArray = (codeArray) => {
+        let code = '[';
+        codeArray.map(item=> {
+            code += `\n${formatObject(item)},`
+        })
+        return code + '\n]';
+    }
+
     const generateExportCode = () => {
         return `export default Form.create()(Page);`;
     }
@@ -79,21 +99,27 @@ const SchemaToCode = () => {
         
         fields.map(action=> {
             let key = tagToComponentKey(action.tag); 
-            let decorator = `{`;
+            let decorator = `{}`;
             let valuePropName = key === 'Switch' ? `valuePropName:'checked'`:'';
-            let required = action.required ? 'rules: [{ required: true }]':'';
-            if (valuePropName || required) {
-                decorator += "\n";
-                if (valuePropName) {
-                    decorator += valuePropName;
+
+            let rules = action.rules || [];
+            if (action.required) {
+                let rule = { required: true };
+                if (action.requiredMessage) {
+                    rule.message = action.requiredMessage;
                 }
-                if (required) {
-                    decorator += required;
-                }
-                decorator += "\n}";
-            } else {
-                decorator += "}";
+                rules.push(rule);
             }
+            let rulesCode = rules.length > 0 ? "rules:" + formatArray(rules) : '';
+
+            let decoratorPropertys = [];
+            valuePropName && decoratorPropertys.push(valuePropName);
+            rulesCode && decoratorPropertys.push(rulesCode);
+
+            if (decoratorPropertys.length > 0) {
+                decorator = `{\n${decoratorPropertys.join(', ')}\n}`;
+            }
+        
 
             let template = `<Form.Item label='${action.label}'>
                 {getFieldDecorator('${action.key}', ${decorator})(
@@ -106,33 +132,35 @@ const SchemaToCode = () => {
         return code;
     }
 
+    const print = (propertyCode) => {
+        return propertyCode ? ' ' + propertyCode : '';
+    }
+
     const generateImportCode = (keys) => {
         return `import React from 'react';
         import { ${keys.join(', ')} } from 'antd';`;
     }
 
-    const generateActionsCode = (actions) => {
+    const generateActionsCode = (actions, layout) => {
         let code = "";
         actions.map((action, i)=> {
             let key = tagToComponentKey(action.tag);
-            code += `<${key}`;
-            if (action.value) {
-                code += ` value=${action.value} `
+            let propertys = [];
+            if (action.submit) {
+                propertys.push('onClick={handleSubmit}');
             }
-            if (!action.text) {
-                code += ` />
-                `
-            } else {
-                code += `>${action.text}</${key}>`
-            }
+            code += `<${key}${print(propertys.join(' '))}>${action.text}</${key}>`;
             if (i !== actions.length - 1) {
-                code += `
-                `;
+                code += `\n`;
             }
         });
-        return `<div className='actions'>
+        let offsetLayout;
+        if (layout.labelCol) {
+            offsetLayout = generateFormLayout({ wrapperCol: { offset: layout.labelCol.span } });
+        }
+        return `<Form.Item${print(offsetLayout)}>
                 ${code}
-            </div>`
+            </Form.Item>`
     }
     
     const tagToImportKey = (tag) => {

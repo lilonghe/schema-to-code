@@ -1,9 +1,19 @@
 {
+    "meta": {
+        "layout": {
+            "labelCol":{ "span": 4},
+            "wrapperCol":{ "span": 14}
+        }
+    },
     "fields": [
         {
             "tag": "input",
             "key": "name",
             "label": "名称",
+            "rules": [
+                {"pattern": "/abc/", "message": "haha"},
+                {"required": true, "message": "need"}
+            ],
             "required": true
         },
         {
@@ -24,7 +34,8 @@
         },
         {
             "tag": "button",
-            "text": "save"
+            "text": "save",
+            "submit": true
         }
     ]
 }
