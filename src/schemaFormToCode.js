@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { message } from 'antd';
 import MonacoEditor, { loader } from '@monaco-editor/react';
 import ConfigEditor from './configEditor';
+import config from '../build/config';
 
 loader.config({
     paths: {
-      vs: '/monaco-editor/min/vs'
+      vs: config.publicPath + 'monaco-editor/min/vs'
     }
 });
 

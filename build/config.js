@@ -1,4 +1,5 @@
 const config  = {
+    publicPath: '/service/schema-to-code/',
     webpack: {
         /**
          * assets loader
