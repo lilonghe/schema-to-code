@@ -1,5 +1,7 @@
+const devMode = process.env.NODE_ENV !== 'production';
+
 const config  = {
-    publicPath: '/service/schema-to-code/',
+    publicPath: devMode? '/' : '/service/schema-to-code/',
     webpack: {
         /**
          * assets loader
