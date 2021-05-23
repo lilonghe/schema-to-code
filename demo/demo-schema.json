@@ -1,5 +1,6 @@
 {
     "meta": {
+        "name": "CreateUser",
         "layout": {
             "labelCol":{ "span": 4},
             "wrapperCol":{ "span": 14}

@@ -42,11 +42,11 @@ const SchemaToCode = () => {
         let importCode = generateImportCode(Object.keys(importComponentKeys));
         let fieldsCode = generateFieldsCode(schema.fields || []);
         let actionsCode = generateActionsCode(schema.actions || [], schema?.meta?.layout || {});
-        let exportCode = generateExportCode();
+        let exportCode = generateExportCode(schema);
         let layoutCode = generateFormLayout(schema?.meta?.layout || {});
         let template = `${importCode}
         
-        const Page = ({ form }) => {
+        const ${schema?.meta?.name || 'Page'} = ({ form }) => {
             const { getFieldDecorator } = form;
 
             const handleSubmit = e => {
@@ -92,7 +92,7 @@ const SchemaToCode = () => {
     }
 
     const generateExportCode = () => {
-        return `export default Form.create()(Page);`;
+        return `export default Form.create()(${schema?.meta?.name || 'Page'});`;
     }
 
     const generateFieldsCode = (fields) => {
