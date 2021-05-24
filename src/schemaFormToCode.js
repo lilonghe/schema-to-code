@@ -1,20 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { message } from 'antd';
-import MonacoEditor, { loader } from '@monaco-editor/react';
 import ConfigEditor from './configEditor';
-import config from '../build/config';
-
-loader.config({
-    paths: {
-      vs: config.publicPath + 'monaco-editor/min/vs'
-    }
-});
+import FinalCodeEditor from "./finalCodeEditor";
 
 const SchemaToCode = () => {
     const [schema, setSchema] = useState();
     const [code, setCode] = useState('');
-    const [finalCode, setFinalCode] = useState();
-    const finalCodeEditor = useRef();
+    const [finalCode, setFinalCode] = useState('');
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -206,18 +198,8 @@ const SchemaToCode = () => {
         }
     }, [schema]);
 
-    useEffect(()=>{
-        if (finalCode) {
-            formatFinalCode();
-        }
-    }, [finalCode]);
-
     const handleChangeFinalCode = (val) => {
         setFinalCode(val);
-    }
-
-    const handleEditorDidMount = async (editor) => {
-        finalCodeEditor.current = editor;
     }
 
     const handleChangeCode = (val) => {
@@ -228,33 +210,14 @@ const SchemaToCode = () => {
         } catch (err) {}
     }
 
-    const formatFinalCode = () => {
-        finalCodeEditor.current.getAction("editor.action.formatDocument").run();
-    }
-
     return <div>
         <input accept='.json' type='file' onChange={handleFileUpload} />
         <div style={{display: 'flex', flexDirection: 'row', border: '1px solid #CCC'}}>
-            <div style={{flex: 1, borderRight: '1px solid #CCC'}}>
+            <div style={{flex: 1}}>
                 <ConfigEditor value={code} onChange={handleChangeCode} />
             </div>
             <div style={{flex: 1}}>
-                <MonacoEditor
-                    height="calc(100vh - 30px)"
-                    language="javascript"
-                    theme='vs-dark'
-                    value={finalCode || ''}
-                    onChange={handleChangeFinalCode}
-                    onMount={handleEditorDidMount}
-                    options={{
-                        formatOnType: true,
-                        formatOnPaste: true,
-                        autoIndent: true,
-                        minimap: {
-                            enabled: false,
-                        },
-                    }}
-                />
+                <FinalCodeEditor value={finalCode} onChange={handleChangeFinalCode} />
             </div>
         </div>
     </div>
