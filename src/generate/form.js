@@ -135,6 +135,7 @@ export default function formSchemaToCode({ schema }) {
                 break;
             case 'switch':
                 key = 'Switch';
+                break;
             case 'select':
                 key = 'Select';
                 break;
