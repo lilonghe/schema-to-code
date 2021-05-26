@@ -14,8 +14,7 @@
             "rules": [
                 {"pattern": "/abc/", "message": "haha"},
                 {"required": true, "message": "need"}
-            ],
-            "required": true
+            ]
         },
         {
             "tag": "textarea",
@@ -26,6 +25,14 @@
             "tag": "switch",
             "label": "启用",
             "key": "enable"
+        },
+        {
+            "tag": "select",
+            "label": "city",
+            "key": "city",
+            "options": [
+                {"key": "shanghai", "label": "上海"}
+            ]
         }
     ],
     "actions": [

@@ -26,16 +26,23 @@ export default function formSchemaToCode({ schema }) {
     const generateFieldsCode = (fields) => {
         let code = "";
         
-        fields.map(action=> {
-            let key = tagToComponentKey(action.tag); 
+        fields.map(userField=> {
+            let field = {
+                key: '',
+                label: '',
+                tag: '',
+                ...userField,
+            }
+            
+            let key = tagToComponentKey(field.tag); 
             let decorator = `{}`;
             let valuePropName = key === 'Switch' ? `valuePropName:'checked'`:'';
 
-            let rules = action.rules || [];
-            if (action.required) {
+            let rules = field.rules || [];
+            if (field.required) {
                 let rule = { required: true };
-                if (action.requiredMessage) {
-                    rule.message = action.requiredMessage;
+                if (field.requiredMessage) {
+                    rule.message = field.requiredMessage;
                 }
                 rules.push(rule);
             }
@@ -48,17 +55,41 @@ export default function formSchemaToCode({ schema }) {
             if (decoratorPropertys.length > 0) {
                 decorator = `{\n${decoratorPropertys.join(', ')}\n}`;
             }
+
+            let formItem;
+            switch(key) {
+                case 'Select':
+                    formItem = generateSelect(field);
+                break;
+                default:
+                    let attrs = generateAttributes(field);
+                    formItem = `<${key}${print(attrs)} />`;
+            }
         
 
-            let template = `<Form.Item label='${action.label}'>
-                {getFieldDecorator('${action.key}', ${decorator})(
-                    <${key} />
+            let template = `<Form.Item label='${field.label}'>
+                {getFieldDecorator('${field.key}', ${decorator})(
+                    ${formItem}
                 )}
             </Form.Item>
             `;
             code += template;
         });
         return code;
+    }
+
+    const generateSelect = (field) => {
+        if(!field.options) {
+            field.options = [];
+        }
+
+        let attrs = generateAttributes(field);
+        let template = `<Select${print(attrs.join(' '))}>
+            ${field.options.map(option=>{
+                return `<Select.Option key={'${option.key}'}>${option.label}</Select.Option>`
+            })}
+        </Select>`
+        return template;
     }
 
     const print = (propertyCode) => {
@@ -104,6 +135,8 @@ export default function formSchemaToCode({ schema }) {
                 break;
             case 'switch':
                 key = 'Switch';
+            case 'select':
+                key = 'Select';
                 break;
         }
         return key;
@@ -124,8 +157,21 @@ export default function formSchemaToCode({ schema }) {
             case 'switch':
                 key = 'Switch';
                 break;
+            case 'select':
+                key = 'Select';
+                break;
         }
         return key;
+    }
+
+    const generateAttributes = (field) => {
+        if (!field.attributes) return [];
+        let attributeArr = [];
+        Object.keys(field.attributes).map(key => {
+            let val = field.attributes[key];
+            attributeArr.push(`${key}=${typeof(val)==='string' ? `'${val}'` : val}`)
+        });
+        return attributeArr;
     }
 
     return () => {

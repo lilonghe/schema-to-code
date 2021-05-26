@@ -15,12 +15,14 @@ export default function FinalCodeEditor({ value, onChange }) {
     }
 
     useEffect(()=>{
-        finalCodeEditor.current && finalCodeEditor.current.getAction("editor.action.formatDocument").run();
-        setTimeout(()=>{
-            // formatDocument 执行完后莫名其妙自动滚动到最下面
-            // 返回顶部
-            finalCodeEditor.current.setScrollTop(0);
-        })
+        if (finalCodeEditor.current) {
+            finalCodeEditor.current.getAction("editor.action.formatDocument").run();
+            setTimeout(()=>{
+                // formatDocument 执行完后莫名其妙自动滚动到最下面
+                // 返回顶部
+                finalCodeEditor.current.setScrollTop(0);
+            })
+        }
     }, [value])
 
     return (
