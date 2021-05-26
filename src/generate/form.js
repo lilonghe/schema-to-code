@@ -1,68 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import { message } from 'antd';
-import ConfigEditor from './configEditor';
-import FinalCodeEditor from "./finalCodeEditor";
-
-const SchemaToCode = () => {
-    const [schema, setSchema] = useState();
-    const [code, setCode] = useState('');
-    const [finalCode, setFinalCode] = useState('');
-
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
-        let text = await file.text();
-        try{
-            setCode(text);
-            let json = JSON.parse(text);
-            setSchema(json);
-        }catch(err) {
-            message.error('格式错误');
-        }
-    }
-
-    const generateCode = () => {
-        let importComponentKeys = { 'Form': true };
-        schema?.fields?.map(field => {
-            let key = tagToImportKey(field.tag);
-            importComponentKeys[key] = true;
-        });
-        schema?.actions?.map(field => {
-            let key = tagToImportKey(field.tag);
-            importComponentKeys[key] = true;
-        });
-
-        let importCode = generateImportCode(Object.keys(importComponentKeys));
-        let fieldsCode = generateFieldsCode(schema.fields || []);
-        let actionsCode = generateActionsCode(schema.actions || [], schema?.meta?.layout || {});
-        let exportCode = generateExportCode(schema);
-        let layoutCode = generateFormLayout(schema?.meta?.layout || {});
-        let template = `${importCode}
-        
-        const ${schema?.meta?.name || 'Page'} = ({ form }) => {
-            const { getFieldDecorator } = form;
-
-            const handleSubmit = e => {
-                e.preventDefault();
-                form.validateFields((err, values) => {
-                  if (!err) {
-                    console.log('Received values of form: ', values);
-                  }
-                });
-            };
-
-            return (
-                <Form${print(layoutCode)}>
-                    ${fieldsCode}
-                    ${actionsCode}
-                </Form>
-            )
-        }
-
-        ${exportCode}
-        `;
-        setFinalCode(template);
-    }
-
+export default function formSchemaToCode({ schema }) {
     const generateFormLayout = (layout) => {
         let propertys = [];
         Object.keys(layout).map(key=> {
@@ -192,35 +128,48 @@ const SchemaToCode = () => {
         return key;
     }
 
-    useEffect(()=>{
-        if (schema) {
-            generateCode();
+    return () => {
+        let importComponentKeys = { 'Form': true };
+        schema?.fields?.map(field => {
+            let key = tagToImportKey(field.tag);
+            importComponentKeys[key] = true;
+        });
+        schema?.actions?.map(field => {
+            let key = tagToImportKey(field.tag);
+            importComponentKeys[key] = true;
+        });
+
+        let importCode = generateImportCode(Object.keys(importComponentKeys));
+        let fieldsCode = generateFieldsCode(schema.fields || []);
+        let actionsCode = generateActionsCode(schema.actions || [], schema?.meta?.layout || {});
+        let exportCode = generateExportCode(schema);
+        let layoutCode = generateFormLayout(schema?.meta?.layout || {});
+        let template = `${importCode}
+        
+        const ${schema?.meta?.name || 'Page'} = ({ form }) => {
+            const { getFieldDecorator } = form;
+
+            const handleSubmit = e => {
+                e.preventDefault();
+                form.validateFields((err, values) => {
+                  if (!err) {
+                    console.log('Received values of form: ', values);
+                  }
+                });
+            };
+
+            return (
+                <Form${print(layoutCode)}>
+                    ${fieldsCode}
+                    ${actionsCode}
+                </Form>
+            )
         }
-    }, [schema]);
 
-    const handleChangeFinalCode = (val) => {
-        setFinalCode(val);
+        ${exportCode}
+        `;
+
+        return template;
     }
 
-    const handleChangeCode = (val) => {
-        setCode(val);
-        try {
-            let json = JSON.parse(val);
-            setSchema(json);
-        } catch (err) {}
-    }
-
-    return <div>
-        <input accept='.json' type='file' onChange={handleFileUpload} />
-        <div style={{display: 'flex', flexDirection: 'row', border: '1px solid #CCC'}}>
-            <div style={{flex: 1}}>
-                <ConfigEditor value={code} onChange={handleChangeCode} />
-            </div>
-            <div style={{flex: 1}}>
-                <FinalCodeEditor value={finalCode} onChange={handleChangeFinalCode} />
-            </div>
-        </div>
-    </div>
 }
-
-export default SchemaToCode;

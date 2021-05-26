@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MonacoEditor, { loader } from '@monaco-editor/react';
-import config from '../build/config';
+import config from '../../build/config';
 loader.config({
     paths: {
       vs: config.publicPath + 'monaco-editor/min/vs'

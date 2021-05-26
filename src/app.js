@@ -1,10 +1,10 @@
 import React from 'react';
 import { hot } from 'react-hot-loader/root';
-import SchemaFormToCode from './schemaFormToCode';
+import SchemaToCode from './schemaToCode';
 
 const App = () => {
     return <div>
-        <SchemaFormToCode />
+        <SchemaToCode />
     </div>
 }
 
