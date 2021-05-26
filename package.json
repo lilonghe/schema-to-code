@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "nodemon --config build/nodemon.json",
-    "build": "webpack --config=build/webpack.pro.js"
+    "build": "NODE_ENV=production webpack --config=build/webpack.pro.js"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.1.3",
