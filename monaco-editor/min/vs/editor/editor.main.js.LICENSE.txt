@@ -1,0 +1,41 @@
+/*!-----------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Version: 0.23.0(82e8ea39fc101d639262435542c7d43bc20d8aa2)
+ * Released under the MIT license
+ * https://github.com/microsoft/vscode/blob/main/LICENSE.txt
+ *-----------------------------------------------------------*/
+
+/*!-----------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * monaco-css version: 3.3.0(ed57760e69ec24098de2b4e49fa5be7f48be019a)
+ * Released under the MIT license
+ * https://github.com/Microsoft/monaco-css/blob/master/LICENSE.md
+ *-----------------------------------------------------------------------------*/
+
+/*!-----------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * monaco-html version: 3.3.0(2a94362905dce7bcd84ac5dab72aa5ad6610a2e2)
+ * Released under the MIT license
+ * https://github.com/Microsoft/monaco-html/blob/master/LICENSE.md
+ *-----------------------------------------------------------------------------*/
+
+/*!-----------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * monaco-json version: 3.4.0(a61dba6bc59a36a9a7e3092a93ad1260c5786b4f)
+ * Released under the MIT license
+ * https://github.com/Microsoft/monaco-json/blob/master/LICENSE.md
+ *-----------------------------------------------------------------------------*/
+
+/*!-----------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * monaco-languages version: 2.3.0(57af10ae0184db4e0f7f9a92ff972629c39ccb53)
+ * Released under the MIT license
+ * https://github.com/Microsoft/monaco-languages/blob/master/LICENSE.md
+ *-----------------------------------------------------------------------------*/
+
+/*!-----------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * monaco-typescript version: 4.3.1(d4e91e07d8144e428885c93029b3d3cbf1994c33)
+ * Released under the MIT license
+ * https://github.com/Microsoft/monaco-typescript/blob/master/LICENSE.md
+ *-----------------------------------------------------------------------------*/
